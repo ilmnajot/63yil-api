@@ -1,0 +1,25 @@
+package com.example._3yilapi.dto;
+
+public record LetterRow(
+        Long id, Integer order,
+        String name,
+        String arabic,
+        String arabicName,
+        String sound,
+        String makhraj,
+        String formIsolated,
+        String formInitial,
+        String formMedial,
+        String formFinal,
+        String exampleArabic,
+        String exampleTranslit,
+        String exampleMeaning,
+        String traceInstructions,
+        String traceForm,
+        String writeInstructions,
+        String writeForm,
+        Long listenId,
+        String listenInstructions,
+        String listenAudioUrl,
+        String repeatInstructions,
+        String repeatAudioUrl) {}

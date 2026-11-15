@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example._3yilapi.mapper.LetterMapper">
+
+    <!-- 1. Home page: all active letters, in alphabet order -->
+    <select id="getAllLetters" resultType="com.example._3yilapi.dto.LetterSummary">
+        select l.id, l.sort_order as "order", l.name, l.arabic
+        from realdb.letters l
+        where l.is_active = 1
+        order by l.sort_order
+    </select>
+
+    <!-- 2. Lesson page: one letter + its 4 activities, as one flat row -->
+    <select id="getOneLetter" resultType="com.example._3yilapi.dto.LetterRow">
+        select l.id,
+               l.sort_order                  as "order",
+               l.name,
+               l.arabic,
+               l.arabic_name                 as "arabicName",
+               l.sound,
+               l.makhraj,
+               l.form_isolated               as "formIsolated",
+               l.form_initial                as "formInitial",
+               l.form_medial                 as "formMedial",
+               l.form_final                  as "formFinal",
+               l.example_arabic              as "exampleArabic",
+               l.example_translit            as "exampleTranslit",
+               l.example_meaning             as "exampleMeaning",
+               t.instructions                as "traceInstructions",
+               coalesce(tf.code, 'isolated') as "traceForm",
+               w.instructions                as "writeInstructions",
+               coalesce(wf.code, 'isolated') as "writeForm",
+               li.id                         as "listenId",
+               li.instructions               as "listenInstructions",
+               li.audio_url                  as "listenAudioUrl",
+               r.instructions                as "repeatInstructions",
+               r.audio_url                   as "repeatAudioUrl"
+        from realdb.letters l
+                 left join realdb.trace t on t.letter_id = l.id and t.is_active = 1
+                 left join realdb.form tf on tf.id = t.form_id
+                 left join realdb.writing w on w.letter_id = l.id and w.is_active = 1
+                 left join realdb.form wf on wf.id = w.form_id
+                 left join realdb.listen li on li.letter_id = l.id and li.is_active = 1
+                 left join realdb.repeat r on r.letter_id = l.id and r.is_active = 1
+        where l.id = #{id}
+          and l.is_active = 1
+    </select>
+
+    <!-- 3. Listen quiz: the wrong-answer letters -->
+    <select id="getDistractors" resultType="com.example._3yilapi.dto.LetterSummary">
+        select l.id, l.sort_order as "order", l.name, l.arabic
+        from realdb.listen_distractor d
+                 join realdb.letters l on l.id = d.distractor_letter_id
+        where d.listen_id = #{listenId}
+          and d.is_active = 1
+          and l.is_active = 1
+        order by l.sort_order
+    </select>
+</mapper>
