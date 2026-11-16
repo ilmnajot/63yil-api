@@ -4,4 +4,5 @@ public record Activities(
         Drawing trace,
         Drawing write,
         Listen listen,
-        Repeat repeat) {}
+        Repeat repeat,
+        Join join) {}

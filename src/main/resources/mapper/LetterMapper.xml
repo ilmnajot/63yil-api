@@ -56,4 +56,21 @@
           and l.is_active = 1
         order by l.sort_order
     </select>
+
+    <!-- 4. Birikma: the step's instructions (no row = no step) -->
+    <select id="getJoining" resultType="com.example._3yilapi.dto.JoiningRow">
+        select j.id, j.instructions
+        from realdb.joining j
+        where j.letter_id = #{letterId}
+          and j.is_active = 1
+    </select>
+
+    <!-- 5. Birikma: its drills, in order -->
+    <select id="getDrills" resultType="com.example._3yilapi.dto.DrillRow">
+        select d.id, d.text, d.features, d.audio_url as "audioUrl"
+        from realdb.drill d
+        where d.joining_id = #{joiningId}
+          and d.is_active = 1
+        order by d.sort_order
+    </select>
 </mapper>

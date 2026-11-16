@@ -38,7 +38,8 @@ public class LetterServiceImpl implements LetterService {
                         new Drawing(orDefault(r.traceInstructions(), r.name() + " harfini nuqtali chiziqlar boʻylab chizing."), r.traceForm()),
                         new Drawing(orDefault(r.writeInstructions(), "Endi " + r.name() + " harfini namunasiz, oʻzingiz yozing."), r.writeForm()),
                         new Listen(orDefault(r.listenInstructions(), "Diqqat bilan tinglang, soʻng eshitgan harfingizni bosing."), r.listenAudioUrl(), distractors),
-                        new Repeat(orDefault(r.repeatInstructions(), r.name() + " harfini tinglang, soʻng uni aytib, ovozingizni yozib oling."), r.repeatAudioUrl())));
+                        new Repeat(orDefault(r.repeatInstructions(), r.name() + " harfini tinglang, soʻng uni aytib, ovozingizni yozib oling."), r.repeatAudioUrl()),
+                        buildJoin(r.id())));
     }
 
     /**
@@ -47,4 +48,14 @@ public class LetterServiceImpl implements LetterService {
     private static String orDefault(String value, String fallback) {
         return value != null ? value : fallback;
     }
+    /** The Birikma step, or null when the letter has no active drills (the UI then hides the step). */
+    private Join buildJoin(Long letterId) {
+        JoiningRow joining = mapper.getJoining(letterId);
+        if (joining == null) return null;
+        List<Drill> drills = mapper.getDrills(joining.id()).stream()
+                .map(d -> new Drill(d.id(), d.text(), List.of(d.features().split(",")), d.audioUrl()))
+                .toList();
+        return drills.isEmpty() ? null : new Join(joining.instructions(), drills);
+    }
+
 }
